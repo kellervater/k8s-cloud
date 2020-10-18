@@ -1,0 +1,26 @@
+sudo: required
+services:
+  - docker
+env:
+  global:
+    - GIT_SHA=$(git rev-parse HEAD) # get current git sha and make it publicly available
+    - CLOUDSK_CORE_DISABLE_PROMPTS=1 # hey gcp: be non-interactive!
+before_install:
+  - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d #decrypt service account file
+  - curl https://sdk.cloud.google.com | bash > /dev/null; # download google sdk
+  - source $HOME/google-cloud-sdk/path.bash.inc # install google sdk
+  - gcloud components update kubectl # install kubectl
+  - gcloud auth activate-service-account --key-file service-account.json # kind of a login for GCP. service account needs to be created beforehands in GCP
+  - gcloud config set project k8s-cloud-292908 # set the gcp project
+  - gcloud config set compute/zone europe-west3-a # set region
+  - gcloud container clusters get-credentials multi-cluster # set k8s-cluster
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin # login to dockerhub
+  - docker build -t ppoetz/react-test -f ./client/Dockerfile.dev ./client # build image
+script:
+  - docker run -e CI=true ppoetz/react-test npm test # test react client
+  -
+deploy:
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: master

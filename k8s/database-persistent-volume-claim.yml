@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim               # Defines Volumes which can be created or associated, or: "Hey k8s! i need xy gib amount of space!"
+metadata:
+  name: database-persistent-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce                       # can be used by a single node
+  resources:
+    requests:
+      storage: 2Gi
