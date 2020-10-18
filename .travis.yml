@@ -18,7 +18,6 @@ before_install:
   - docker build -t ppoetz/react-test -f ./client/Dockerfile.dev ./client # build image
 script:
   - docker run -e CI=true ppoetz/react-test npm test # test react client
-  -
 deploy:
   provider: script
   script: bash ./deploy.sh
