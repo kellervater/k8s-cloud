@@ -9,12 +9,10 @@ spec:
     kind: ClusterIssuer
   commonName: your.training    # your domain name
   dnsNames:
-    - your.training
     - k8s.your.training
   acme:
     config:
       - http01:
           ingressClass: nginx
         domains:
-          - your.training
           - k8s.your.training
